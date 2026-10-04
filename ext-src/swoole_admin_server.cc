@@ -25,6 +25,14 @@ END_EXTERN_C()
 #include <sstream>
 #include <thread>
 
+/* PHP's main/snprintf.h does "#define snprintf ap_php_snprintf", which rewrites
+ * nlohmann/json's (std::snprintf) into std::ap_php_snprintf and breaks compilation
+ * (binary_reader.hpp:273). Undefine it so the vendored header uses the real
+ * std::snprintf from <cstdio>. swoole uses sw_snprintf elsewhere, so this is safe. */
+#ifdef snprintf
+#undef snprintf
+#endif
+
 #include "nlohmann/json.hpp"
 
 using json = nlohmann::json;

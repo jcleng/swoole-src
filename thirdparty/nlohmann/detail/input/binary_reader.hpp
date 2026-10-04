@@ -270,6 +270,12 @@ class binary_reader
             default: // anything else not supported (yet)
             {
                 std::array<char, 3> cr{{}};
+                /* PHP's main/snprintf.h defines snprintf as ap_php_snprintf, which
+                 * corrupts (std::snprintf) below when building inside PHP. Undefine
+                 * so the real std::snprintf (from <cstdio>) is used. */
+#ifdef snprintf
+#undef snprintf
+#endif
                 (std::snprintf)(cr.data(), cr.size(), "%.2hhX", static_cast<unsigned char>(element_type));
                 return sax->parse_error(element_type_parse_position, std::string(cr.data()), parse_error::create(114, element_type_parse_position, "Unsupported BSON record type 0x" + std::string(cr.data())));
             }
